@@ -10,6 +10,8 @@ urlpatterns = [
     path('register/', UserCreateView.as_view(), name='user-register'),
     path('login/', LoginView.as_view(), name='login'),
     path('private-chats/', PrivateChatListCreateView.as_view(), name='private-chat-list'),
-    path('conversations/<str:user_id>/', ConversationMessageListCreateView.as_view(), name='conversation-messages')
+    path('conversations/<str:user_id>/', ConversationMessageListCreateView.as_view(), name='conversation-messages'),
+    path('search-users/', search_users, name='search_users'),
 ]
+
 

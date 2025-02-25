@@ -36,6 +36,9 @@ INSTALLED_APPS += [
     'channels',
     'rest_framework_simplejwt',
     "rest_framework_simplejwt.token_blacklist",
+    ## Elastic search
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
 ]
 
 MIDDLEWARE = [
@@ -160,3 +163,16 @@ CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split()
 # # WebSockets security
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 SECURE_BROWSER_XSS_FILTER = False
+
+## Elastic seach 
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': os.getenv('ELASTIC_HOST')
+    },
+}
+
+import warnings
+from elasticsearch import ElasticsearchWarning
+
+warnings.filterwarnings("ignore", category=ElasticsearchWarning)
+ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = "django_elasticsearch_dsl.signals.RealTimeSignalProcessor"

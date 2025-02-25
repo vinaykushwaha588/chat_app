@@ -8,7 +8,6 @@ from .models import Message
 @receiver(post_save, sender=Message)
 def broadcast_new_message(sender, instance, created, **kwargs):
     if created:
-        # Compute the same group name as in the consumer using sender and receiver IDs
         sender_id = instance.sender.id
         receiver_id = instance.receiver.id
         sorted_ids = sorted([str(sender_id), str(receiver_id)])

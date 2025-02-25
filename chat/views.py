@@ -148,3 +148,27 @@ class ConversationMessageListCreateView(generics.ListCreateAPIView):
         other_user_id = self.kwargs['user_id']
         other_user = get_object_or_404(User, pk=other_user_id)
         serializer.save(sender=self.request.user, receiver=other_user)
+
+
+
+"""
+    Elastic Search
+"""
+from django.http import JsonResponse
+from chat.elastic import FakeUserDocument
+
+def search_users(request):
+    query = request.GET.get('q', '')
+
+    if not query:
+        return JsonResponse({'error': 'Please provide a search query'}, status=400)
+
+    search_results = FakeUserDocument.search().query(
+        "multi_match",
+        query=query,
+        fields=["first_name", "last_name", "email", "phone"]
+    )
+
+    results = [{"first_name": hit.first_name, "last_name": hit.last_name, "email": hit.email, "phone": hit.phone, "gender": hit.gender} for hit in search_results]
+
+    return JsonResponse({"results": results})

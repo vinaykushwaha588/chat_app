@@ -116,3 +116,15 @@ class Message(BaseUUID):
         self.seen = True
         self.save(update_fields=['seen'])
 
+
+class FakeUserData(models.Model):
+    id = models.BigAutoField(primary_key=True) 
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, unique=True)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')])
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.email})"
