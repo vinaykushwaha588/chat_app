@@ -3,13 +3,27 @@ from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Message, User
 from channels.db import database_sync_to_async
+from datetime import datetime
+from channels.layers import get_channel_layer
 
+
+channel_layer = get_channel_layer()
+
+async def send_chat_message(sender, receiver, message):
+    """ Sends message only to the receiver's WebSocket group """
+    await channel_layer.group_send(
+        f"chat_{receiver}",  
+        {
+            "type": "chat_message",
+            "message": message,
+            "sender": sender
+        }
+    )       
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-
 
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -38,16 +52,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 "type": "chat_message",
                 "message": message,
-                "sender": sender
+                "sender": sender,
+                "sender_channel": self.channel_name  
             }
-        )        
+        ) 
 
     async def chat_message(self, event):
-        await self.send(text_data=json.dumps({
-            "message": event["message"],
-            "sender": event["sender"]
-        }))
-
+        """ Sends message only to other users in the group, not the sender """
+        if event["sender_channel"] != self.channel_name:  
+            await self.send(text_data=json.dumps({
+                "message": event["message"],
+                "sender": event["sender"],
+                "timestamp": datetime.utcnow().isoformat()
+            }))
 
 
 class OneToOneChatConsumer(AsyncWebsocketConsumer):
