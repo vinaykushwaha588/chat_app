@@ -1,5 +1,0 @@
-- pipeline: vinay_pipeline
-  refs:
-  - refs/heads/master
-  fail_on_prepare_env_warning: true
-  resources: NANO
